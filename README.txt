@@ -1,8 +1,7 @@
-"Tennis" v1.1
+"Press 'A' to Win" v0.1
 
-A simple table-tennis simulator with an adaptive AI that adjust its difficulty 
-to the player's skills. Based on Chris DeLeon's Udemy programming course, 
-"Code Your First Game: Arcade Classic in JavaScript on Canvas" (available at 
-https://www.udemy.com/code-your-first-game/).
+Press 'A' to win! If you don't press 'A', you won't win. Don't you want to win?
+
+Ported to HTML/JavaScript from a Python/PyGame college project.
 
 See LICENSE.txt for ownership and licensing information.

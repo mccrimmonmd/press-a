@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) 2017 by Malcolm McCrimmon
+Copyright (c) 2021 by Malcolm McCrimmon
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,4 +24,8 @@ THE SOFTWARE.
 
 All sounds recorded 2016 by [Malcolm McCrimmon](https://insearchofsecrets.com/). They are licensed under a [CC BY-SA 4.0 International license](https://creativecommons.org/licenses/by-sa/4.0/).
 
-All images created 2016 by [Erin Maes](https://scarywordsblog.wordpress.com/). They are licensed under a [CC BY-SA 4.0 International license](https://creativecommons.org/licenses/by-sa/4.0/).
+The button graphic Button-Red.png was created by Wikimedia user "AzaToth" and
+is licensed under a CC BY-SA 3.0 Unported license. Retrieved March 2014 from
+<http://commons.wikimedia.org/wiki/File:Button-Red.svg>
+
+All other images created 2016 by [Erin Maes](https://scarywordsblog.wordpress.com/). They are licensed under a [CC BY-SA 4.0 International license](https://creativecommons.org/licenses/by-sa/4.0/).
