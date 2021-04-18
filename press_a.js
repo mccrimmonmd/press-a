@@ -3,8 +3,11 @@ var canvasContext;
 
 var buttonImg = new Image();
 buttonImg.src = "images/Button-Red.png";
+var flippedImg = new Image();
+flippedImg.src = "images/Button-Red-Flipped.png";
 var isPressed = false;
 var score = 0;
+const WINNING_SCORE = 360;
 
 var ballX = 300;
 var ballY = 350;
@@ -76,28 +79,41 @@ function handleMouseClick(evt) {
 	//TODO: if mouse is in button, press button
 	if (pos.x > MUTE_POS.x && pos.x < MUTE_POS.x+80 &&
 		pos.y < MUTE_POS.y && pos.y > MUTE_POS.y-20) {
-			isPressed = true;
+			pressButton();
 	}
 }
 
 function handleMouseUp(evt) {
-	isPressed = false;
+	releaseButton();
 }
 
 function handleKeyDown(evt) {
+	console.log("In handleKeyDown");
 	if (evt.keyCode === 27) { //esc
 		//TODO: show confirmation dialog
 		score = 0;
 	}
 	if (evt.keyCode === 65) {
-		isPressed = true;
+		console.log("Pressing button");
+		pressButton();
 	}
 }
 
 function handleKeyUp(evt) {
 	if (evt.keyCode === 65) {
-		isPressed = false;
+		releaseButton();
 	}
+}
+
+function pressButton() {
+	if (score < WINNING_SCORE) {
+		isPressed = true;
+		score += 1;
+	}
+}
+
+function releaseButton() {
+	isPressed = false;
 }
 
 window.onload = function() {
@@ -106,17 +122,18 @@ window.onload = function() {
 
 	var framesPerSecond = 30;
 	setInterval( function() {
-		moveEverything();
+		//moveEverything();
 		drawEverything();
 	}, 1000/framesPerSecond );
 
 	canvas.addEventListener('mousedown', handleMouseClick);
 	canvas.addEventListener('mouseup', handleMouseUp);
-	canvas.addEventListener('keydown', handleKeyDown);
-	canvas.addEventListener('keyup', handleKeyUp);
+	console.log("Adding keydown event listener");
+	document.addEventListener('keydown', handleKeyDown);
+	document.addEventListener('keyup', handleKeyUp);
 };
 
-function computerMovement() {
+/*function computerMovement() {
 	var paddleCenter = rightPaddleY + (PADDLE_HEIGHT/2);
 
 	if (paddleCenter < ballY-COMPUTER_MOVE_BUFFER) {
@@ -274,7 +291,7 @@ function drawPause() {
 	canvasContext.textAlign = 'left';
 	canvasContext.font = 'normal 10pt monospace';
 	canvasContext.fillText("(click anywhere to pause)", PAUSE_POS.x,PAUSE_POS.y);
-}
+}*/
 
 function colorCircle(centerX,centerY, radius, drawColor) {
 	canvasContext.fillStyle = drawColor;
@@ -290,7 +307,8 @@ function colorRect(leftX,topY, width,height, drawColor) {
 
 function drawEverything() {
 	colorRect(0,0, canvas.width,canvas.height, 'white');
-	canvasContext.drawImage(buttonImg, canvas.width/2,canvas.height/2);
+	var button = isPressed ? flippedImg : buttonImg;
+	canvasContext.drawImage(button, canvas.width/2,canvas.height/2);
 	canvasContext.fillStyle = 'black';
 	canvasContext.textAlign = 'center';
 	canvasContext.font = 'normal 200pt monospace';
