@@ -6,64 +6,10 @@ buttonImg.src = "images/Button-Red.png";
 var flippedImg = new Image();
 flippedImg.src = "images/Button-Red-Flipped.png";
 var isPressed = false;
-var buttonRadius = 250;
+var buttonRadius = 200;
 
 var score = 0;
 const WINNING_SCORE = 360;
-
-/*var ballX = 300;
-var ballY = 350;
-var ballSpeedX = 10;
-var ballSpeedY = 0;
-var ballMissed = false;
-const BALL_RADIUS = 10;
-
-var playerScore = 0;
-var computerScore = 0;
-var playerScoredLast;
-//const WINNING_SCORE = 1;
-
-var showingStartScreen = true;
-var showingWinScreen = false;
-
-var leftPaddleY = 300;
-var rightPaddleY = 300;
-const PADDLE_HEIGHT = 100;
-const PADDLE_WIDTH = 10;
-const PADDLE_GAP = 208;
-
-var computerSpeed = 0;
-var computerMaxSpeed = 7;
-var computerAccel = 0.5;
-const COMPUTER_MOVE_BUFFER = 35;
-
-var isMuted = false;
-var isPaused = false;
-const MUTE_POS = {x:50, y:580};
-const PAUSE_POS = {x:980, y:580};
-
-var bonkSnd = new Audio("bonk.mp3");
-var whiffSnd = new Audio("whiff.mp3");
-var yussSnd = new Audio("yuss.mp3");
-var awwSnd = new Audio("aww.mp3");
-var allSounds = [bonkSnd, whiffSnd, yussSnd, awwSnd];
-
-var coffeeImg = new Image();
-coffeeImg.src = "images/computer_coffee.png";
-var sleepImg = new Image();
-sleepImg.src = "images/computer_sleep.png";
-var playerReadyImg = new Image();
-playerReadyImg.src = "images/player_ready.png";
-var playerHitImg = new Image();
-playerHitImg.src = "images/player_hit.png";
-var computerReadyImg = new Image();
-computerReadyImg.src = "images/computer_ready.png";
-var computerHitImg = new Image();
-computerHitImg.src = "images/computer_hit.png";
-
-var playerTimer = 0;
-var computerTimer = 0;
-const ANIMATE_LENGTH = 15;*/
 
 function calculateMousePos(evt) {
 	var rect = canvas.getBoundingClientRect();
@@ -146,7 +92,7 @@ function colorRect(leftX,topY, width,height, drawColor) {
 
 function drawEverything() {
 	colorRect(0,0, canvas.width,canvas.height, 'white');
-	canvasContext.strokeRect(0,0, canvas.width,canvas.height);
+	//canvasContext.strokeRect(0,0, canvas.width,canvas.height);
 	var button = isPressed ? flippedImg : buttonImg;
 	var buttonPosition = {x: canvas.width/2 - buttonRadius,
 												y: canvas.height/2 - buttonRadius};
@@ -160,4 +106,20 @@ function drawEverything() {
 	var textPosition = {x: canvas.width / 2 + (isPressed ? 2 : 0),
 											y: canvas.height /2 + (isPressed ? 2 : 0)};
 	canvasContext.fillText("A", textPosition.x, textPosition.y);
+	canvasContext.font = 'normal ' + Math.ceil(pointSize / 4) + 'pt monospace';
+	var captionPosition = {x: canvas.width / 2,
+												 y: canvas.height / 2 + buttonRadius + 50};
+	canvasContext.fillText(getCaption(score), captionPosition.x, captionPosition.y);
+}
+
+function getCaption(currentScore) {
+	if (currentScore === 0) return "Press 'A' to win!";
+	else if (currentScore < 20) return "That's it! Keep going!";
+	else if (currentScore < 50) return "You're doing great!";
+	else if (currentScore < 100) return "You're gonna win so hard!";
+	else if (currentScore < 150) return "Faster! Faster!";
+	else if (currentScore < 200) return "Keep going! Don't give up!";
+	else if (currentScore < 265) return "Almost there!";
+	else if (currentScore < WINNING_SCORE) return "Soooo close!";
+	else return "CONGRATULATIONS! YOU WIN!!!";
 }
