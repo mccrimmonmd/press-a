@@ -6,7 +6,7 @@ buttonImg.src = "images/Button-Red.png";
 var flippedImg = new Image();
 flippedImg.src = "images/Button-Red-Flipped.png";
 var isPressed = false;
-var buttonRadius = 300;
+var buttonRadius = 250;
 
 var score = 0;
 const WINNING_SCORE = 360;
@@ -90,13 +90,11 @@ function handleMouseUp(evt) {
 }
 
 function handleKeyDown(evt) {
-	console.log("In handleKeyDown");
 	if (evt.keyCode === 27) { //esc
 		//TODO: show confirmation dialog
 		score = 0;
 	}
 	if (evt.keyCode === 65) {
-		console.log("Pressing button");
 		pressButton();
 	}
 }
@@ -130,7 +128,6 @@ window.onload = function() {
 
 	canvas.addEventListener('mousedown', handleMouseClick);
 	canvas.addEventListener('mouseup', handleMouseUp);
-	console.log("Adding keydown event listener");
 	document.addEventListener('keydown', handleKeyDown);
 	document.addEventListener('keyup', handleKeyUp);
 };
@@ -149,14 +146,18 @@ function colorRect(leftX,topY, width,height, drawColor) {
 
 function drawEverything() {
 	colorRect(0,0, canvas.width,canvas.height, 'white');
+	canvasContext.strokeRect(0,0, canvas.width,canvas.height);
 	var button = isPressed ? flippedImg : buttonImg;
 	var buttonPosition = {x: canvas.width/2 - buttonRadius,
 												y: canvas.height/2 - buttonRadius};
 	canvasContext.drawImage(button, buttonPosition.x,buttonPosition.y,
-																	buttonRadius,buttonRadius);
+																	buttonRadius*2,buttonRadius*2);
 	canvasContext.fillStyle = 'black';
 	canvasContext.textBaseline = 'middle';
 	canvasContext.textAlign = 'center';
-	canvasContext.font = 'normal 200pt monospace';
-	canvasContext.fillText("A", canvas.width/2,canvas.height/2);
+	var pointSize = Math.ceil(buttonRadius * (2/3));
+	canvasContext.font = 'normal ' + pointSize + 'pt monospace';
+	var textPosition = {x: canvas.width / 2 + (isPressed ? 2 : 0),
+											y: canvas.height /2 + (isPressed ? 2 : 0)};
+	canvasContext.fillText("A", textPosition.x, textPosition.y);
 }
