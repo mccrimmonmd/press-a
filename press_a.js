@@ -22,11 +22,17 @@ function calculateMousePos(evt) {
 	};
 }
 
+function distanceFromButton(pos) {
+	var a = Math.abs(pos.x - canvas.width/2);
+	var b = Math.abs(pos.y - canvas.height/2);
+	return Math.sqrt(a*a + b*b);
+}
+
 function handleMouseClick(evt) {
 	var pos = calculateMousePos(evt);
-	//TODO: if mouse is in button, press button
-	if (pos.x > MUTE_POS.x && pos.x < MUTE_POS.x+80 &&
-		pos.y < MUTE_POS.y && pos.y > MUTE_POS.y-20) {
+	var dist = distanceFromButton(pos);
+	console.log(dist);
+	if (dist <= buttonRadius) {
 			pressButton();
 	}
 }
