@@ -6,7 +6,7 @@ buttonImg.src = "images/Button-Red.png";
 var flippedImg = new Image();
 flippedImg.src = "images/Button-Red-Flipped.png";
 var isPressed = false;
-var buttonRadius = 200;
+var buttonRadius = 180; //ratio to canvas width: 6.1111 aka 55/9
 
 var score = 0;
 const WINNING_SCORE = 360;
@@ -31,7 +31,6 @@ function distanceFromButton(pos) {
 function handleMouseClick(evt) {
 	var pos = calculateMousePos(evt);
 	var dist = distanceFromButton(pos);
-	console.log(dist);
 	if (dist <= buttonRadius) {
 			pressButton();
 	}
@@ -98,7 +97,7 @@ function colorRect(leftX,topY, width,height, drawColor) {
 
 function drawEverything() {
 	colorRect(0,0, canvas.width,canvas.height, 'white');
-	//canvasContext.strokeRect(0,0, canvas.width,canvas.height);
+	canvasContext.strokeRect(0,0, canvas.width,canvas.height);
 	var button = isPressed ? flippedImg : buttonImg;
 	var buttonPosition = {x: canvas.width/2 - buttonRadius,
 												y: canvas.height/2 - buttonRadius};
