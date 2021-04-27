@@ -9,7 +9,6 @@ var isPressed = false;
 var buttonRadius = 200; //default
 const buttonRatio = 5;
 const MIN_WIDTH = 200;
-//var buttonRadius = 180; //ratio to canvas width: 6.1111 aka 55/9
 
 var score = 0;
 const WINNING_SCORE = 360;
@@ -120,6 +119,7 @@ function colorRect(leftX,topY, width,height, drawColor) {
 
 function drawEverything() {
 	colorRect(0,0, canvas.width,canvas.height, 'white');
+	//canvasContext.strokeRect(0,0, canvas.width,canvas.height);
 	drawButton();
 	var pointSize = Math.ceil(buttonRadius * (2/3));
 	drawLetter(pointSize);
@@ -127,7 +127,6 @@ function drawEverything() {
 }
 
 function drawButton() {
-	canvasContext.strokeRect(0,0, canvas.width,canvas.height);
 	var button = isPressed ? flippedImg : buttonImg;
 	var buttonPosition = {x: canvas.width/2 - buttonRadius,
 												y: canvas.height/2 - buttonRadius};
