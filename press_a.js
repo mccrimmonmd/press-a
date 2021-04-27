@@ -6,7 +6,10 @@ buttonImg.src = "images/Button-Red.png";
 var flippedImg = new Image();
 flippedImg.src = "images/Button-Red-Flipped.png";
 var isPressed = false;
-var buttonRadius = 180; //ratio to canvas width: 6.1111 aka 55/9
+var buttonRadius = 200; //default
+const buttonRatio = 5;
+const MIN_WIDTH = 200;
+//var buttonRadius = 180; //ratio to canvas width: 6.1111 aka 55/9
 
 var score = 0;
 const WINNING_SCORE = 360;
@@ -81,7 +84,27 @@ window.onload = function() {
 	canvas.addEventListener('mouseup', handleMouseUp);
 	document.addEventListener('keydown', handleKeyDown);
 	document.addEventListener('keyup', handleKeyUp);
+
+	resizeCanvas();
 };
+window.onresize = resizeCanvas;
+
+function resizeCanvas() {
+	if (window.innerWidth !== canvas.width) {
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerWidth;
+	}
+	if (window.innerHeight < canvas.height) {
+		canvas.width = window.innerHeight;
+		canvas.height = window.innerHeight;
+	}
+	if (canvas.width < MIN_WIDTH) {
+		canvas.width = MIN_WIDTH;
+		canvas.height = MIN_WIDTH;
+	}
+
+	buttonRadius = Math.ceil(canvas.width / buttonRatio);
+}
 
 function colorCircle(centerX,centerY, radius, drawColor) {
 	canvasContext.fillStyle = drawColor;
@@ -97,24 +120,38 @@ function colorRect(leftX,topY, width,height, drawColor) {
 
 function drawEverything() {
 	colorRect(0,0, canvas.width,canvas.height, 'white');
+	drawButton();
+	var pointSize = Math.ceil(buttonRadius * (2/3));
+	drawLetter(pointSize);
+	drawCaption(pointSize);
+}
+
+function drawButton() {
 	canvasContext.strokeRect(0,0, canvas.width,canvas.height);
 	var button = isPressed ? flippedImg : buttonImg;
 	var buttonPosition = {x: canvas.width/2 - buttonRadius,
 												y: canvas.height/2 - buttonRadius};
 	canvasContext.drawImage(button, buttonPosition.x,buttonPosition.y,
 																	buttonRadius*2,buttonRadius*2);
+}
+
+function drawLetter(pointSize) {
 	canvasContext.fillStyle = 'black';
 	canvasContext.textBaseline = 'middle';
 	canvasContext.textAlign = 'center';
-	var pointSize = Math.ceil(buttonRadius * (2/3));
 	canvasContext.font = 'normal ' + pointSize + 'pt monospace';
 	var textPosition = {x: canvas.width / 2 + (isPressed ? 2 : 0),
 											y: canvas.height /2 + (isPressed ? 2 : 0)};
 	canvasContext.fillText("A", textPosition.x, textPosition.y);
+}
+
+function drawCaption(pointSize) {
 	canvasContext.font = 'normal ' + Math.ceil(pointSize / 4) + 'pt monospace';
+	var buffer = canvas.width / 20;
 	var captionPosition = {x: canvas.width / 2,
-												 y: canvas.height / 2 + buttonRadius + 50};
-	canvasContext.fillText(getCaption(score), captionPosition.x, captionPosition.y);
+												 y: canvas.height / 2 + buttonRadius + buffer};
+	canvasContext.fillText(getCaption(score), captionPosition.x,
+																						captionPosition.y);
 }
 
 function getCaption(currentScore) {
