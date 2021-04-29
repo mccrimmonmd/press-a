@@ -124,6 +124,8 @@ function drawEverything() {
 	var pointSize = Math.ceil(buttonRadius * (2/3));
 	drawLetter(pointSize);
 	drawCaption(pointSize);
+	var pos = {x: 50, y: 50};
+	drawRect(pos, 20, "#f00");
 }
 
 function drawButton() {
@@ -163,4 +165,17 @@ function getCaption(currentScore) {
 	else if (currentScore < 265) return "Almost there!";
 	else if (currentScore < WINNING_SCORE) return "Soooo close!";
 	else return "CONGRATULATIONS! YOU WIN!!!";
+}
+
+function drawRect(position, size, color) {
+	console.log(color);
+	var ctx = canvasContext;
+	ctx.fillStyle = color;
+	ctx.beginPath();
+	ctx.moveTo(position.x, position.y);
+	ctx.lineTo(position.x + size, position.y);
+	ctx.lineTo(position.x + size, position.y + size);
+	ctx.lineTo(position.x + size, position.y);
+	ctx.closePath();
+	ctx.fill();
 }
