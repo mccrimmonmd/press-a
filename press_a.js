@@ -125,7 +125,7 @@ function drawEverything() {
 	drawLetter(pointSize);
 	drawCaption(pointSize);
 	var pos = {x: 50, y: 50};
-	drawRect(pos, 20, "#f00");
+	drawSquare(pos, 20, "red");
 }
 
 function drawButton() {
@@ -167,15 +167,15 @@ function getCaption(currentScore) {
 	else return "CONGRATULATIONS! YOU WIN!!!";
 }
 
-function drawRect(position, size, color) {
-	console.log(color);
-	var ctx = canvasContext;
-	ctx.fillStyle = color;
-	ctx.beginPath();
-	ctx.moveTo(position.x, position.y);
-	ctx.lineTo(position.x + size, position.y);
-	ctx.lineTo(position.x + size, position.y + size);
-	ctx.lineTo(position.x + size, position.y);
-	ctx.closePath();
-	ctx.fill();
+function drawSquare(position, size, color) {
+	canvasContext.fillStyle = color;
+	var square = new Path2D();
+	// square.moveTo(position.x, position.y);
+	// square.lineTo(position.x + size, position.y);
+	// square.lineTo(position.x + size, position.y + size);
+	// square.lineTo(position.x, position.y + size);
+	// square.closePath();
+	// canvasContext.fill(square);
+	canvasContext.rect(position.x, position.y, size, size);
+	canvasContext.fill();
 }
