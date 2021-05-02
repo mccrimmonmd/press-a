@@ -12,7 +12,7 @@ const buttonRatio = 5;
 var confettiRatio = 10;
 const MIN_WIDTH = 200;
 
-var score = 0;
+var score = 359;
 const WINNING_SCORE = 360;
 
 function calculateMousePos(evt) {
@@ -127,7 +127,9 @@ function drawEverything() {
 	var pointSize = Math.ceil(buttonRadius * (2/3));
 	drawLetter(pointSize);
 	drawCaption(pointSize);
-	drawConfettii();
+	if (score >= WINNING_SCORE) {
+		drawConfettii();
+	}
 }
 
 function drawButton() {
@@ -172,6 +174,7 @@ function getCaption(currentScore) {
 function drawConfettii() {
 	if (Math.random() > 0.75) {
 		//generate new confetti
+		console.log("HELF");
 	}
 	//draw + animate confetti
 	var pos = {x: 50, y: 50};
