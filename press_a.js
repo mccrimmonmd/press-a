@@ -7,7 +7,9 @@ var flippedImg = new Image();
 flippedImg.src = "images/Button-Red-Flipped.png";
 var isPressed = false;
 var buttonRadius = 200; //default
+var confettiSize = 10; //default
 const buttonRatio = 5;
+var confettiRatio = 10;
 const MIN_WIDTH = 200;
 
 var score = 0;
@@ -103,14 +105,15 @@ function resizeCanvas() {
 	}
 
 	buttonRadius = Math.ceil(canvas.width / buttonRatio);
+	confettiSize = Math.ceil(buttonRadius / confettiRatio);
 }
 
-function colorCircle(centerX,centerY, radius, drawColor) {
+/*function colorCircle(centerX,centerY, radius, drawColor) {
 	canvasContext.fillStyle = drawColor;
 	canvasContext.beginPath();
 	canvasContext.arc(centerX,centerY, radius, 0,Math.PI*2, true);
 	canvasContext.fill();
-}
+}*/
 
 function colorRect(leftX,topY, width,height, drawColor) {
 	canvasContext.fillStyle = drawColor;
@@ -124,8 +127,7 @@ function drawEverything() {
 	var pointSize = Math.ceil(buttonRadius * (2/3));
 	drawLetter(pointSize);
 	drawCaption(pointSize);
-	var pos = {x: 50, y: 50};
-	drawSquare(pos, 20, "red");
+	drawConfettii();
 }
 
 function drawButton() {
@@ -167,7 +169,17 @@ function getCaption(currentScore) {
 	else return "CONGRATULATIONS! YOU WIN!!!";
 }
 
-function drawSquare(position, size, color) {
+function drawConfettii() {
+	if (Math.random() > 0.75) {
+		//generate new confetti
+	}
+	//draw + animate confetti
+	var pos = {x: 50, y: 50};
+	drawSquare(pos, confettiSize, "red");
+	//delete confetti that are out of view
+}
+
+function drawSquare(position, size, color) { //TODO: add rotation
 	canvasContext.fillStyle = color;
 	var square = new Path2D();
 	// square.moveTo(position.x, position.y);
@@ -178,4 +190,5 @@ function drawSquare(position, size, color) {
 	// canvasContext.fill(square);
 	canvasContext.rect(position.x, position.y, size, size);
 	canvasContext.fill();
+	canvasContext.strokeRect(position.x, position.y, size, size);
 }
