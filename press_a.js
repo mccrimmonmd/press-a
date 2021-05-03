@@ -13,7 +13,7 @@ const buttonRatio = 5;
 var confetti = [];
 var confettiSize = 10; //default
 var confettiRatio = 10;
-var CONFETTI_DENSITY = 0.25; //0 = no confetti, 1 = all confetti
+var CONFETTI_DENSITY = 0.05; //0 = no confetti, 1 = all confetti
 const COLORS = ["red", "yellow", "blue"];
 
 var score = 359;
@@ -112,13 +112,9 @@ function resizeCanvas() {
 	confettiSize = Math.ceil(buttonRadius / confettiRatio);
 }
 
-function colorRect(leftX,topY, width,height, drawColor) {
-	canvasContext.fillStyle = drawColor;
-	canvasContext.fillRect(leftX,topY, width,height);
-}
-
 function drawEverything() {
-	colorRect(0,0, canvas.width,canvas.height, 'white');
+	canvasContext.fillStyle = 'white';
+	canvasContext.fillRect(0,0, canvas.width,canvas.height);
 	//canvasContext.strokeRect(0,0, canvas.width,canvas.height);
 	drawButton();
 	var pointSize = Math.ceil(buttonRadius * (2/3));
@@ -170,8 +166,9 @@ function getCaption(currentScore) {
 
 function drawConfetti() {
 	if (Math.random() < CONFETTI_DENSITY) {
+		console.log("adding new confetti");
 		var newConfetti = {
-			xPos: randInt(Math.floor(canvas.width)),
+			xPos: randInt(canvas.width),
 			yPos: -confettiSize,
 			color: COLORS[randInt(COLORS.length)],
 			ySpeed: Math.random() * 1.5 + 0.75
@@ -181,20 +178,27 @@ function drawConfetti() {
 	confetti.forEach((confetto) => {
 		drawSquare(confetto.xPos, confetto.yPos,
 							 confettiSize,
-							 confetti.color);
+							 confetto.color);
 		confetto.yPos += confetto.ySpeed;
 	});
 	// var pos = {x: 50, y: 50};
 	// drawSquare(pos, confettiSize, "red");
+	console.log(confetti);
+	if (confetti.length > 0) {
+		console.log(confetti[0].yPos);
+		console.log(confettiSize);
+		console.log(canvas.height);
+	}
 	while (confetti.length > 0
-				 && confetti[0].yPos + confettiSize > canvas.height) {
+				 && (confetti[0].yPos - confettiSize) > canvas.height) {
 		confetti.shift();
+		console.log("confetti deleted!");
 	}
 }
 
 function drawSquare(xPos, yPos, size, color) { //TODO: add rotation
 	canvasContext.fillStyle = color;
-	var square = new Path2D();
+	// var square = new Path2D();
 	// square.moveTo(position.x, position.y);
 	// square.lineTo(position.x + size, position.y);
 	// square.lineTo(position.x + size, position.y + size);
@@ -202,7 +206,7 @@ function drawSquare(xPos, yPos, size, color) { //TODO: add rotation
 	// square.closePath();
 	// canvasContext.fill(square);
 	canvasContext.rect(xPos, yPos, size, size);
-	canvasContext.fill();
+	//canvasContext.fill();
 	canvasContext.strokeRect(xPos, yPos, size, size);
 }
 
