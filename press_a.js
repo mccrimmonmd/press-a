@@ -1,5 +1,6 @@
 var canvas;
 var canvasContext;
+const MIN_WIDTH = 200;
 
 var buttonImg = new Image();
 buttonImg.src = "images/Button-Red.png";
@@ -7,10 +8,13 @@ var flippedImg = new Image();
 flippedImg.src = "images/Button-Red-Flipped.png";
 var isPressed = false;
 var buttonRadius = 200; //default
-var confettiSize = 10; //default
 const buttonRatio = 5;
+
+var confetti = [];
+var confettiSize = 10; //default
 var confettiRatio = 10;
-const MIN_WIDTH = 200;
+var CONFETTI_DENSITY = 0.25; //0 = no confetti, 1 = all confetti
+const COLORS = ["red", "yellow", "blue"];
 
 var score = 359;
 const WINNING_SCORE = 360;
@@ -108,13 +112,6 @@ function resizeCanvas() {
 	confettiSize = Math.ceil(buttonRadius / confettiRatio);
 }
 
-/*function colorCircle(centerX,centerY, radius, drawColor) {
-	canvasContext.fillStyle = drawColor;
-	canvasContext.beginPath();
-	canvasContext.arc(centerX,centerY, radius, 0,Math.PI*2, true);
-	canvasContext.fill();
-}*/
-
 function colorRect(leftX,topY, width,height, drawColor) {
 	canvasContext.fillStyle = drawColor;
 	canvasContext.fillRect(leftX,topY, width,height);
@@ -128,7 +125,7 @@ function drawEverything() {
 	drawLetter(pointSize);
 	drawCaption(pointSize);
 	if (score >= WINNING_SCORE) {
-		drawConfettii();
+		drawConfetti();
 	}
 }
 
@@ -171,18 +168,31 @@ function getCaption(currentScore) {
 	else return "CONGRATULATIONS! YOU WIN!!!";
 }
 
-function drawConfettii() {
-	if (Math.random() > 0.75) {
-		//generate new confetti
-		console.log("HELF");
+function drawConfetti() {
+	if (Math.random() < CONFETTI_DENSITY) {
+		var newConfetti = {
+			xPos: randInt(Math.floor(canvas.width)),
+			yPos: -confettiSize,
+			color: COLORS[randInt(COLORS.length)],
+			ySpeed: Math.random() * 1.5 + 0.75
+		};
+		confetti.push(newConfetti);
 	}
-	//draw + animate confetti
-	var pos = {x: 50, y: 50};
-	drawSquare(pos, confettiSize, "red");
-	//delete confetti that are out of view
+	confetti.forEach((confetto) => {
+		drawSquare(confetto.xPos, confetto.yPos,
+							 confettiSize,
+							 confetti.color);
+		confetto.yPos += confetto.ySpeed;
+	});
+	// var pos = {x: 50, y: 50};
+	// drawSquare(pos, confettiSize, "red");
+	while (confetti.length > 0
+				 && confetti[0].yPos + confettiSize > canvas.height) {
+		confetti.shift();
+	}
 }
 
-function drawSquare(position, size, color) { //TODO: add rotation
+function drawSquare(xPos, yPos, size, color) { //TODO: add rotation
 	canvasContext.fillStyle = color;
 	var square = new Path2D();
 	// square.moveTo(position.x, position.y);
@@ -191,7 +201,15 @@ function drawSquare(position, size, color) { //TODO: add rotation
 	// square.lineTo(position.x, position.y + size);
 	// square.closePath();
 	// canvasContext.fill(square);
-	canvasContext.rect(position.x, position.y, size, size);
+	canvasContext.rect(xPos, yPos, size, size);
 	canvasContext.fill();
-	canvasContext.strokeRect(position.x, position.y, size, size);
+	canvasContext.strokeRect(xPos, yPos, size, size);
+}
+
+function randInt(upper, lower = 0) {
+	if (upper > lower) {
+		var range = upper - lower;
+		return Math.floor(Math.random() * range) + lower;
+	}
+	return 0;
 }
