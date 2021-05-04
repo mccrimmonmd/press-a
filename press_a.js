@@ -13,8 +13,8 @@ const buttonRatio = 5;
 var confetti = [];
 var confettiSize = 10; //default
 var confettiRatio = 10;
-var CONFETTI_DENSITY = 0.05; //0 = no confetti, 1 = all confetti
-const COLORS = ["red", "yellow", "blue"];
+var CONFETTI_DENSITY = 0.25; //0 = no confetti, 1 = all confetti
+const COLORS = ["red", "yellow", "blue", "green", "purple"];
 
 var score = 359;
 const WINNING_SCORE = 360;
@@ -114,8 +114,6 @@ function resizeCanvas() {
 
 function drawEverything() {
 	canvasContext.clearRect(0,0, canvas.width,canvas.height);
-	// canvasContext.fillStyle = 'white';
-	// canvasContext.fillRect(0,0, canvas.width,canvas.height);
 	//canvasContext.strokeRect(0,0, canvas.width,canvas.height);
 	drawButton();
 	var pointSize = Math.ceil(buttonRadius * (2/3));
@@ -170,9 +168,8 @@ function getCaption(currentScore) {
 
 function drawConfetti() {
 	if (Math.random() < CONFETTI_DENSITY) {
-		console.log("adding new confetti");
 		var newConfetti = {
-			xPos: randInt(canvas.width),
+			xPos: randNum(canvas.width),
 			yPos: -confettiSize,
 			color: COLORS[randInt(COLORS.length)],
 			ySpeed: Math.random() * 1.5 + 0.75
@@ -185,14 +182,12 @@ function drawConfetti() {
 							 confetto.color);
 		confetto.yPos += confetto.ySpeed;
 	});
-	// var pos = {x: 50, y: 50};
-	// drawSquare(pos, confettiSize, "red");
 	console.log(confetti);
 	if (confetti.length > 0) {
 		console.log(confetti[0].yPos);
 		console.log(confettiSize);
 		console.log(canvas.height);
-	}
+	} //TODO: proper deletion
 	while (confetti.length > 0
 				 && (confetti[0].yPos - confettiSize) > canvas.height) {
 		confetti.shift();
@@ -214,10 +209,14 @@ function drawSquare(xPos, yPos, size, color) { //TODO: add rotation
 	canvasContext.strokeRect(xPos, yPos, size, size);
 }
 
-function randInt(upper, lower = 0) {
+function randNum(upper, lower = 0) {
 	if (upper > lower) {
 		var range = upper - lower;
-		return Math.floor(Math.random() * range) + lower;
+		return Math.random() * range + lower;
 	}
 	return 0;
+}
+
+function randInt(upper, lower = 0) {
+	return Math.floor(randNum(upper, lower));
 }
