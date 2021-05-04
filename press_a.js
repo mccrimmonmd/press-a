@@ -113,8 +113,9 @@ function resizeCanvas() {
 }
 
 function drawEverything() {
-	canvasContext.fillStyle = 'white';
-	canvasContext.fillRect(0,0, canvas.width,canvas.height);
+	canvasContext.clearRect(0,0, canvas.width,canvas.height);
+	// canvasContext.fillStyle = 'white';
+	// canvasContext.fillRect(0,0, canvas.width,canvas.height);
 	//canvasContext.strokeRect(0,0, canvas.width,canvas.height);
 	drawButton();
 	var pointSize = Math.ceil(buttonRadius * (2/3));
@@ -144,6 +145,9 @@ function drawLetter(pointSize) {
 }
 
 function drawCaption(pointSize) {
+	canvasContext.fillStyle = 'black';
+	canvasContext.textBaseline = 'middle';
+	canvasContext.textAlign = 'center';
 	canvasContext.font = 'normal ' + Math.ceil(pointSize / 4) + 'pt monospace';
 	var buffer = canvas.width / 20;
 	var captionPosition = {x: canvas.width / 2,
@@ -198,15 +202,15 @@ function drawConfetti() {
 
 function drawSquare(xPos, yPos, size, color) { //TODO: add rotation
 	canvasContext.fillStyle = color;
-	// var square = new Path2D();
-	// square.moveTo(position.x, position.y);
-	// square.lineTo(position.x + size, position.y);
-	// square.lineTo(position.x + size, position.y + size);
-	// square.lineTo(position.x, position.y + size);
-	// square.closePath();
-	// canvasContext.fill(square);
-	canvasContext.rect(xPos, yPos, size, size);
-	//canvasContext.fill();
+	var square = new Path2D();
+	square.moveTo(xPos, yPos);
+	square.lineTo(xPos + size, yPos);
+	square.lineTo(xPos + size, yPos + size);
+	square.lineTo(xPos, yPos + size);
+	square.closePath();
+	canvasContext.fill(square);
+	// canvasContext.rect(xPos, yPos, size, size);
+	// canvasContext.fill();
 	canvasContext.strokeRect(xPos, yPos, size, size);
 }
 
