@@ -14,7 +14,7 @@ var confetti = [];
 var confettiSize = 10; //default
 var confettiRatio = 10;
 var CONFETTI_DENSITY = 0.25; //0 = no confetti, 1 = all confetti
-const COLORS = ["red", "yellow", "blue", "green", "purple"];
+const COLORS = ["cyan", "magenta", "yellow", "red",  "blue", "green"]; //, "purple"
 
 var score = 359;
 const WINNING_SCORE = 360;
@@ -52,6 +52,7 @@ function handleKeyDown(evt) {
 	if (evt.keyCode === 27) { //esc
 		//TODO: show confirmation dialog
 		score = 0;
+	  confetti = [];
 	}
 	if (evt.keyCode === 65) {
 		pressButton();
@@ -181,18 +182,25 @@ function drawConfetti() {
 							 confettiSize,
 							 confetto.color);
 		confetto.yPos += confetto.ySpeed;
+		//TODO: side-to-side drift
 	});
-	console.log(confetti);
-	if (confetti.length > 0) {
-		console.log(confetti[0].yPos);
-		console.log(confettiSize);
-		console.log(canvas.height);
-	} //TODO: proper deletion
-	while (confetti.length > 0
-				 && (confetti[0].yPos - confettiSize) > canvas.height) {
-		confetti.shift();
-		console.log("confetti deleted!");
-	}
+	var toDelete = [];
+	confetti.forEach((confetto, index) => {
+		if (confetto.yPos - confettiSize > canvas.height) {
+			toDelete.push(index);
+		}
+	});
+	// var long = false;
+	// if (toDelete.length > 1) {
+	// 	long = true;
+	// 	debugger;
+	// }
+	toDelete.forEach((pos, index) => {
+		// if (long) {
+		// 	console.log("deleting confetti at position " + pos + " minus index " + index);
+		// }
+		confetti.splice(pos - index, 1);
+	})
 }
 
 function drawSquare(xPos, yPos, size, color) { //TODO: add rotation
