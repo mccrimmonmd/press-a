@@ -13,7 +13,8 @@ const buttonRatio = 5;
 var confetti = [];
 var confettiSize = 10; //default
 var confettiRatio = 10;
-var CONFETTI_DENSITY = 0.25; //0 = no confetti, 1 = all confetti
+var CONFETTI_DENSITY = 0.25; //0 = no confetti, 1 = max confetti
+var DRIFT_RATIO = 10;
 const COLORS = ["cyan", "magenta", "yellow", "red",  "blue", "green"]; //, "purple"
 
 var score = 359;
@@ -173,7 +174,8 @@ function drawConfetti() {
 			xPos: randNum(canvas.width),
 			yPos: -confettiSize,
 			color: COLORS[randInt(COLORS.length)],
-			ySpeed: Math.random() * 1.5 + 0.75
+			yVel: Math.random() * 1.5 + 0.75,
+			xVel: randInt(10)
 		};
 		confetti.push(newConfetti);
 	}
@@ -181,8 +183,7 @@ function drawConfetti() {
 		drawSquare(confetto.xPos, confetto.yPos,
 							 confettiSize,
 							 confetto.color);
-		confetto.yPos += confetto.ySpeed;
-		//TODO: side-to-side drift
+	  animateConfetti(confetto);
 	});
 	var toDelete = [];
 	confetti.forEach((confetto, index) => {
@@ -190,17 +191,9 @@ function drawConfetti() {
 			toDelete.push(index);
 		}
 	});
-	// var long = false;
-	// if (toDelete.length > 1) {
-	// 	long = true;
-	// 	debugger;
-	// }
 	toDelete.forEach((pos, index) => {
-		// if (long) {
-		// 	console.log("deleting confetti at position " + pos + " minus index " + index);
-		// }
 		confetti.splice(pos - index, 1);
-	})
+	});
 }
 
 function drawSquare(xPos, yPos, size, color) { //TODO: add rotation
@@ -212,9 +205,31 @@ function drawSquare(xPos, yPos, size, color) { //TODO: add rotation
 	square.lineTo(xPos, yPos + size);
 	square.closePath();
 	canvasContext.fill(square);
-	// canvasContext.rect(xPos, yPos, size, size);
-	// canvasContext.fill();
 	canvasContext.strokeRect(xPos, yPos, size, size);
+}
+
+function animateConfetti(confetto) {
+	var drift = confetto.xVel;
+	confetto.yPos += confetto.yVel;
+	confetto.xPos += drift / DRIFT_RATIO;
+	
+	//poor man's sine wave--I came up with this myself, apparently??
+	if (drift % 2 === 0) {
+		if (drift < 20) {
+			confetto.xVel += 2;
+		}
+		else {
+			confetto.xVel = 21;
+		}
+	}
+	else {
+		if (drift > -21) {
+			confetto.xVel -= 2;
+		}
+		else {
+			confetto.xVel = -20;
+		}
+	}
 }
 
 function randNum(upper, lower = 0) {
