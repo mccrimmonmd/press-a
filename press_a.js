@@ -96,7 +96,7 @@ window.onload = function() {
 };
 window.onresize = resizeCanvas;
 
-function resizeCanvas() {
+function resizeCanvas() { //TODO: don't restrict to square
 	if (window.innerWidth !== canvas.width) {
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerWidth;
@@ -196,23 +196,35 @@ function drawConfetti() {
 	});
 }
 
-function drawSquare(xPos, yPos, size, color) { //TODO: add rotation
+function drawSquare(xPos, yPos, size, color, rotation = 0) { //TODO: add rotation
 	canvasContext.fillStyle = color;
+	var points = rotateSquareAt(xPos, yPos, size, rotation);
 	var square = new Path2D();
-	square.moveTo(xPos, yPos);
-	square.lineTo(xPos + size, yPos);
-	square.lineTo(xPos + size, yPos + size);
-	square.lineTo(xPos, yPos + size);
+	square.moveTo(points[0].x, points[0].y);
+	square.lineTo(points[1].x, points[1].y);
+	square.lineTo(points[2].x, points[2].y);
+	square.lineTo(points[3].x, points[3].y);
 	square.closePath();
 	canvasContext.fill(square);
 	canvasContext.strokeRect(xPos, yPos, size, size);
 }
 
+function rotateSquareAt(xPos, yPos, size, rotation) {
+	// TODO: x = cos(angle)*x - sin(angle)*y; y = cos(angle)*x + sin(angle)*y
+	return [
+		{x:xPos, 				y:yPos},
+		{x:xPos + size, y:yPos},
+		{x:xPos + size, y:yPos + size},
+		{x:xPos, 				y:yPos + size}
+	];
+}
+
 function animateConfetti(confetto) {
 	var drift = confetto.xVel;
+	// confetto.yVel = Math.abs(drift === 0 ? 0 : 1/drift) * 2 + 1;
 	confetto.yPos += confetto.yVel;
 	confetto.xPos += drift / DRIFT_RATIO;
-	
+
 	//poor man's sine wave--I came up with this myself, apparently??
 	if (drift % 2 === 0) {
 		if (drift < 20) {
