@@ -196,7 +196,8 @@ function drawConfetti() {
 	});
 }
 
-function drawSquare(xPos, yPos, size, color, rotation = 0) { //TODO: add rotation
+// TODO?: make position center of square, not top left
+function drawSquare(xPos, yPos, size, color, rotation = 0) {
 	canvasContext.fillStyle = color;
 	var points = rotateSquareAt(xPos, yPos, size, rotation);
 	var square = new Path2D();
@@ -209,8 +210,26 @@ function drawSquare(xPos, yPos, size, color, rotation = 0) { //TODO: add rotatio
 	canvasContext.strokeRect(xPos, yPos, size, size);
 }
 
-function rotateSquareAt(xPos, yPos, size, rotation) {
-	// TODO: x = cos(angle)*x - sin(angle)*y; y = cos(angle)*x + sin(angle)*y
+function rotateSquareAt(xPos, yPos, size, angle) {
+	// TODO: non-square canvas
+	var maxOffset = canvas.width + (size / 2);
+	var minOffset = canvas.width - (size / 2);
+	var cos = Math.cos(angle);
+	var sin = Math.sin(angle);
+	var translated = [
+		{x:xPos - maxOffset, y:yPos - maxOffset},
+		{x:xPos - minOffset, y:yPos - maxOffset},
+		{x:xPos - minOffset, y:yPos - minOffset},
+		{x:xPos - maxOffset, y:yPos - minOffset}
+	];
+	var rotated = translated.map(point => {
+		var newX = point.x * cos - point.y * sin;
+		var newY = point.y * cos + point.x * sin;
+		return {x:newX, y:newY};
+	});
+	return rotated.map(point => {
+		//
+	})
 	return [
 		{x:xPos, 				y:yPos},
 		{x:xPos + size, y:yPos},
