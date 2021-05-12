@@ -13,7 +13,7 @@ const buttonRatio = 5;
 var confetti = [];
 var confettiSize = 10; //default
 var confettiRatio = 10;
-var CONFETTI_DENSITY = 0.25; //0 = no confetti, 1 = max confetti
+var CONFETTI_DENSITY = 0.01; //0 = no confetti, 1 = max confetti
 var DRIFT_RATIO = 10;
 const COLORS = ["cyan", "magenta", "yellow", "red",  "blue", "green"]; //, "purple"
 
@@ -196,10 +196,10 @@ function drawConfetti() {
 	});
 }
 
-// TODO?: make position center of square, not top left
-function drawSquare(xPos, yPos, size, color, rotation = 0) {
+function drawSquare(xPos, yPos, size, color, rotation = 1) {
 	canvasContext.fillStyle = color;
 	var points = rotateSquareAt(xPos, yPos, size, rotation);
+	// console.log(points[0].x);
 	var square = new Path2D();
 	square.moveTo(points[0].x, points[0].y);
 	square.lineTo(points[1].x, points[1].y);
@@ -211,31 +211,35 @@ function drawSquare(xPos, yPos, size, color, rotation = 0) {
 }
 
 function rotateSquareAt(xPos, yPos, size, angle) {
-	// TODO: non-square canvas
-	var maxOffset = canvas.width + (size / 2);
-	var minOffset = canvas.width - (size / 2);
+	var offset = {
+		x: {max: xPos + (size / 2), min: xPos - (size / 2)},
+		y: {max: yPos + (size / 2), min: yPos - (size / 2)}
+	};
+	// var maxOffset = canvas.width + (size / 2);
+	// var minOffset = canvas.width - (size / 2);
 	var cos = Math.cos(angle);
 	var sin = Math.sin(angle);
 	var translated = [
-		{x:xPos - maxOffset, y:yPos - maxOffset},
-		{x:xPos - minOffset, y:yPos - maxOffset},
-		{x:xPos - minOffset, y:yPos - minOffset},
-		{x:xPos - maxOffset, y:yPos - minOffset}
+		{x:xPos - offset.x.max, y:yPos - offset.y.max},
+		{x:xPos - offset.x.min, y:yPos - offset.y.max},
+		{x:xPos - offset.x.min, y:yPos - offset.y.min},
+		{x:xPos - offset.x.max, y:yPos - offset.y.min}
 	];
 	var rotated = translated.map(point => {
 		var newX = point.x * cos - point.y * sin;
 		var newY = point.y * cos + point.x * sin;
 		return {x:newX, y:newY};
 	});
-	return rotated.map(point => {
-		//
-	})
-	return [
-		{x:xPos, 				y:yPos},
-		{x:xPos + size, y:yPos},
-		{x:xPos + size, y:yPos + size},
-		{x:xPos, 				y:yPos + size}
-	];
+	return rotated.map(point => ({
+		x:point.x + offset.x.max,
+		y:point.y + offset.y.max
+	}));
+	// return [
+	// 	{x:xPos, 				y:yPos},
+	// 	{x:xPos + size, y:yPos},
+	// 	{x:xPos + size, y:yPos + size},
+	// 	{x:xPos, 				y:yPos + size}
+	// ];
 }
 
 function animateConfetti(confetto) {
