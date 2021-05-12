@@ -1,30 +1,30 @@
-var canvas;
-var canvasContext;
+let canvas;
+let canvasContext;
 const MIN_WIDTH = 200;
 
-var buttonImg = new Image();
+let buttonImg = new Image();
 buttonImg.src = "images/Button-Red.png";
-var flippedImg = new Image();
+let flippedImg = new Image();
 flippedImg.src = "images/Button-Red-Flipped.png";
-var isPressed = false;
-var buttonRadius = 200; //default
+let isPressed = false;
+let buttonRadius = 200; //default
 const buttonRatio = 5;
 
-var confetti = [];
-var confettiSize = 10; //default
-var confettiRatio = 10;
-var CONFETTI_DENSITY = 0.01; //0 = no confetti, 1 = max confetti
-var DRIFT_RATIO = 10;
+let confetti = [];
+let confettiSize = 10; //default
+let confettiRatio = 10;
+let CONFETTI_DENSITY = 0.01; //0 = no confetti, 1 = max confetti
+let DRIFT_RATIO = 10;
 const COLORS = ["cyan", "magenta", "yellow", "red",  "blue", "green"]; //, "purple"
 
-var score = 359;
+let score = 359;
 const WINNING_SCORE = 360;
 
 function calculateMousePos(evt) {
-	var rect = canvas.getBoundingClientRect();
-	var root = document.documentElement;
-	var mouseX = evt.clientX - rect.left - root.scrollLeft;
-	var mouseY = evt.clientY - rect.top - root.scrollTop;
+	let rect = canvas.getBoundingClientRect();
+	let root = document.documentElement;
+	let mouseX = evt.clientX - rect.left - root.scrollLeft;
+	let mouseY = evt.clientY - rect.top - root.scrollTop;
 	return {
 		x:mouseX,
 		y:mouseY
@@ -32,14 +32,14 @@ function calculateMousePos(evt) {
 }
 
 function distanceFromButton(pos) {
-	var a = Math.abs(pos.x - canvas.width/2);
-	var b = Math.abs(pos.y - canvas.height/2);
+	let a = Math.abs(pos.x - canvas.width/2);
+	let b = Math.abs(pos.y - canvas.height/2);
 	return Math.sqrt(a*a + b*b);
 }
 
 function handleMouseClick(evt) {
-	var pos = calculateMousePos(evt);
-	var dist = distanceFromButton(pos);
+	let pos = calculateMousePos(evt);
+	let dist = distanceFromButton(pos);
 	if (dist <= buttonRadius) {
 			pressButton();
 	}
@@ -81,9 +81,8 @@ window.onload = function() {
 	canvas = document.getElementById('gameCanvas');
 	canvasContext = canvas.getContext('2d');
 
-	var framesPerSecond = 30;
+	let framesPerSecond = 30;
 	setInterval( function() {
-		//moveEverything();
 		drawEverything();
 	}, 1000/framesPerSecond );
 
@@ -118,7 +117,7 @@ function drawEverything() {
 	canvasContext.clearRect(0,0, canvas.width,canvas.height);
 	//canvasContext.strokeRect(0,0, canvas.width,canvas.height);
 	drawButton();
-	var pointSize = Math.ceil(buttonRadius * (2/3));
+	let pointSize = Math.ceil(buttonRadius * (2/3));
 	drawLetter(pointSize);
 	drawCaption(pointSize);
 	if (score >= WINNING_SCORE) {
@@ -127,8 +126,8 @@ function drawEverything() {
 }
 
 function drawButton() {
-	var button = isPressed ? flippedImg : buttonImg;
-	var buttonPosition = {x: canvas.width/2 - buttonRadius,
+	let button = isPressed ? flippedImg : buttonImg;
+	let buttonPosition = {x: canvas.width/2 - buttonRadius,
 												y: canvas.height/2 - buttonRadius};
 	canvasContext.drawImage(button, buttonPosition.x,buttonPosition.y,
 																	buttonRadius*2,buttonRadius*2);
@@ -139,7 +138,7 @@ function drawLetter(pointSize) {
 	canvasContext.textBaseline = 'middle';
 	canvasContext.textAlign = 'center';
 	canvasContext.font = 'normal ' + pointSize + 'pt monospace';
-	var textPosition = {x: canvas.width / 2 + (isPressed ? 2 : 0),
+	let textPosition = {x: canvas.width / 2 + (isPressed ? 2 : 0),
 											y: canvas.height /2 + (isPressed ? 2 : 0)};
 	canvasContext.fillText("A", textPosition.x, textPosition.y);
 }
@@ -149,8 +148,8 @@ function drawCaption(pointSize) {
 	canvasContext.textBaseline = 'middle';
 	canvasContext.textAlign = 'center';
 	canvasContext.font = 'normal ' + Math.ceil(pointSize / 4) + 'pt monospace';
-	var buffer = canvas.width / 20;
-	var captionPosition = {x: canvas.width / 2,
+	let buffer = canvas.width / 20;
+	let captionPosition = {x: canvas.width / 2,
 												 y: canvas.height / 2 + buttonRadius + buffer};
 	canvasContext.fillText(getCaption(score), captionPosition.x,
 																						captionPosition.y);
@@ -170,7 +169,7 @@ function getCaption(currentScore) {
 
 function drawConfetti() {
 	if (Math.random() < CONFETTI_DENSITY) {
-		var newConfetti = {
+		let newConfetti = {
 			xPos: randNum(canvas.width),
 			yPos: -confettiSize,
 			color: COLORS[randInt(COLORS.length)],
@@ -185,7 +184,7 @@ function drawConfetti() {
 							 confetto.color);
 	  animateConfetti(confetto);
 	});
-	var toDelete = [];
+	let toDelete = [];
 	confetti.forEach((confetto, index) => {
 		if (confetto.yPos - confettiSize > canvas.height) {
 			toDelete.push(index);
@@ -196,11 +195,10 @@ function drawConfetti() {
 	});
 }
 
-function drawSquare(xPos, yPos, size, color, rotation = 1) {
+function drawSquare(xPos, yPos, size, color, rotation = 0) {
 	canvasContext.fillStyle = color;
-	var points = rotateSquareAt(xPos, yPos, size, rotation);
-	// console.log(points[0].x);
-	var square = new Path2D();
+	let points = rotateSquareAt(xPos, yPos, size, rotation);
+	let square = new Path2D();
 	square.moveTo(points[0].x, points[0].y);
 	square.lineTo(points[1].x, points[1].y);
 	square.lineTo(points[2].x, points[2].y);
@@ -211,39 +209,31 @@ function drawSquare(xPos, yPos, size, color, rotation = 1) {
 }
 
 function rotateSquareAt(xPos, yPos, size, angle) {
-	var offset = {
+	let offset = {
 		x: {max: xPos + (size / 2), min: xPos - (size / 2)},
 		y: {max: yPos + (size / 2), min: yPos - (size / 2)}
 	};
-	// var maxOffset = canvas.width + (size / 2);
-	// var minOffset = canvas.width - (size / 2);
-	var cos = Math.cos(angle);
-	var sin = Math.sin(angle);
-	var translated = [
+	let cos = Math.cos(angle);
+	let sin = Math.sin(angle);
+	let translated = [
 		{x:xPos - offset.x.max, y:yPos - offset.y.max},
 		{x:xPos - offset.x.min, y:yPos - offset.y.max},
 		{x:xPos - offset.x.min, y:yPos - offset.y.min},
 		{x:xPos - offset.x.max, y:yPos - offset.y.min}
 	];
-	var rotated = translated.map(point => {
-		var newX = point.x * cos - point.y * sin;
-		var newY = point.y * cos + point.x * sin;
+	let rotated = translated.map(point => {
+		let newX = point.x * cos - point.y * sin;
+		let newY = point.y * cos + point.x * sin;
 		return {x:newX, y:newY};
 	});
 	return rotated.map(point => ({
 		x:point.x + offset.x.max,
 		y:point.y + offset.y.max
 	}));
-	// return [
-	// 	{x:xPos, 				y:yPos},
-	// 	{x:xPos + size, y:yPos},
-	// 	{x:xPos + size, y:yPos + size},
-	// 	{x:xPos, 				y:yPos + size}
-	// ];
 }
 
 function animateConfetti(confetto) {
-	var drift = confetto.xVel;
+	let drift = confetto.xVel;
 	// confetto.yVel = Math.abs(drift === 0 ? 0 : 1/drift) * 2 + 1;
 	confetto.yPos += confetto.yVel;
 	confetto.xPos += drift / DRIFT_RATIO;
@@ -269,7 +259,7 @@ function animateConfetti(confetto) {
 
 function randNum(upper, lower = 0) {
 	if (upper > lower) {
-		var range = upper - lower;
+		let range = upper - lower;
 		return Math.random() * range + lower;
 	}
 	return 0;
