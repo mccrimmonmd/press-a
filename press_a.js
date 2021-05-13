@@ -13,7 +13,7 @@ const buttonRatio = 5;
 let confetti = [];
 let confettiSize = 10; //default
 let confettiRatio = 10;
-let CONFETTI_DENSITY = 0.01; //0 = no confetti, 1 = max confetti
+let CONFETTI_DENSITY = 0.25; //0 = no confetti, 1 = max confetti
 let DRIFT_RATIO = 10;
 const COLORS = ["cyan", "magenta", "yellow", "red",  "blue", "green"]; //, "purple"
 
@@ -174,16 +174,17 @@ function drawConfetti() {
 			yPos: -confettiSize,
 			color: COLORS[randInt(COLORS.length)],
 			yVel: Math.random() * 1.5 + 0.75,
-			xVel: randInt(10),
-			percentRotated: 0, //randInt(25),
-			rotVel: 0
+			xVel: randInt(-10, 10),
+			percentRotated: randInt(25),
+			rotVel: randInt(-3, 3)
 		};
 		confetti.push(newConfetti);
 	}
 	confetti.forEach((confetto) => {
 		drawSquare(confetto.xPos, confetto.yPos,
 							 confettiSize,
-							 confetto.color);
+							 confetto.color,
+						   confetto.percentRotated);
 	  animateConfetti(confetto);
 	});
 	let toDelete = [];
@@ -197,10 +198,10 @@ function drawConfetti() {
 	});
 }
 
-function drawSquare(xPos, yPos, size, color, rotation = 33) {
+function drawSquare(xPos, yPos, size, color, twisted = 0) {
 	canvasContext.fillStyle = color;
 	canvasContext.strokeStyle = "black";
-	let points = rotateSquareAt(xPos, yPos, size, rotation/100);
+	let points = rotateSquareAt(xPos, yPos, size, twisted/100);
 	let square = new Path2D();
 	square.moveTo(points[0].x, points[0].y);
 	square.lineTo(points[1].x, points[1].y);
@@ -216,20 +217,19 @@ function rotateSquareAt(xPos, yPos, size, angle) {
 		x: {max: xPos + (size / 2), min: xPos - (size / 2)},
 		y: {max: yPos + (size / 2), min: yPos - (size / 2)}
 	};
-	let radians =  2 * Math.PI * angle;
-	let cos = Math.cos(radians);
-	let sin = Math.sin(radians);
 	let translated = [
 		{x:xPos - offset.x.max, y:yPos - offset.y.max},
 		{x:xPos - offset.x.min, y:yPos - offset.y.max},
 		{x:xPos - offset.x.min, y:yPos - offset.y.min},
 		{x:xPos - offset.x.max, y:yPos - offset.y.min}
 	];
-	let rotated = translated.map(point => {
-		let newX = point.x * cos - point.y * sin;
-		let newY = point.y * cos + point.x * sin;
-		return {x:newX, y:newY};
-	});
+	let radians =  2 * Math.PI * angle;
+	let cos = Math.cos(radians);
+	let sin = Math.sin(radians);
+	let rotated = translated.map(point => ({
+		x: point.x * cos - point.y * sin,
+		y: point.y * cos + point.x * sin
+	}));
 	return rotated.map(point => ({
 		x:point.x + offset.x.max,
 		y:point.y + offset.y.max
@@ -237,7 +237,8 @@ function rotateSquareAt(xPos, yPos, size, angle) {
 }
 
 function animateConfetti(confetto) {
-	// TODO: update rotation as int in range [0...100]
+	confetto.percentRotated += confetto.rotVel;
+	confetto.percentRotated %= 100;
 
 	let drift = confetto.xVel;
 	// confetto.yVel = Math.abs(drift === 0 ? 0 : 1/drift) * 2 + 1;
@@ -263,14 +264,25 @@ function animateConfetti(confetto) {
 	}
 }
 
-function randNum(upper, lower = 0) {
-	if (upper > lower) {
-		let range = upper - lower;
-		return Math.random() * range + lower;
+function randNum(bound, upperBound = null) {
+	let lowerBound;
+	if (upperBound === null) {
+		upperBound = bound;
+		lowerBound = 0;
 	}
-	return 0;
+	else {
+		lowerBound = bound;
+	}
+
+	if (lowerBound <= upperBound) {
+		let range = upperBound - lowerBound;
+		return Math.random() * range + lowerBound;
+	}
+	else {
+		return 0;
+	}
 }
 
-function randInt(upper, lower = 0) {
-	return Math.floor(randNum(upper, lower));
+function randInt(bound, upperBound = null) {
+	return Math.floor(randNum(bound, upperBound));
 }
