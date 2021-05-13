@@ -174,7 +174,9 @@ function drawConfetti() {
 			yPos: -confettiSize,
 			color: COLORS[randInt(COLORS.length)],
 			yVel: Math.random() * 1.5 + 0.75,
-			xVel: randInt(10)
+			xVel: randInt(10),
+			percentRotated: 0, //randInt(25),
+			rotVel: 0
 		};
 		confetti.push(newConfetti);
 	}
@@ -195,9 +197,10 @@ function drawConfetti() {
 	});
 }
 
-function drawSquare(xPos, yPos, size, color, rotation = 0) {
+function drawSquare(xPos, yPos, size, color, rotation = 33) {
 	canvasContext.fillStyle = color;
-	let points = rotateSquareAt(xPos, yPos, size, rotation);
+	canvasContext.strokeStyle = "black";
+	let points = rotateSquareAt(xPos, yPos, size, rotation/100);
 	let square = new Path2D();
 	square.moveTo(points[0].x, points[0].y);
 	square.lineTo(points[1].x, points[1].y);
@@ -205,7 +208,7 @@ function drawSquare(xPos, yPos, size, color, rotation = 0) {
 	square.lineTo(points[3].x, points[3].y);
 	square.closePath();
 	canvasContext.fill(square);
-	canvasContext.strokeRect(xPos, yPos, size, size);
+	canvasContext.stroke(square);
 }
 
 function rotateSquareAt(xPos, yPos, size, angle) {
@@ -213,8 +216,9 @@ function rotateSquareAt(xPos, yPos, size, angle) {
 		x: {max: xPos + (size / 2), min: xPos - (size / 2)},
 		y: {max: yPos + (size / 2), min: yPos - (size / 2)}
 	};
-	let cos = Math.cos(angle);
-	let sin = Math.sin(angle);
+	let radians =  2 * Math.PI * angle;
+	let cos = Math.cos(radians);
+	let sin = Math.sin(radians);
 	let translated = [
 		{x:xPos - offset.x.max, y:yPos - offset.y.max},
 		{x:xPos - offset.x.min, y:yPos - offset.y.max},
@@ -233,6 +237,8 @@ function rotateSquareAt(xPos, yPos, size, angle) {
 }
 
 function animateConfetti(confetto) {
+	// TODO: update rotation as int in range [0...100]
+
 	let drift = confetto.xVel;
 	// confetto.yVel = Math.abs(drift === 0 ? 0 : 1/drift) * 2 + 1;
 	confetto.yPos += confetto.yVel;
