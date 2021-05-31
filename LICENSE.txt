@@ -22,7 +22,8 @@ THE SOFTWARE.
 
 -----------------------------------------------------------------------------
 
-All sounds recorded 2016 by [Malcolm McCrimmon](https://insearchofsecrets.com/). They are licensed under a [CC BY-SA 4.0 International license](https://creativecommons.org/licenses/by-sa/4.0/).
+All sounds recorded 2016 by [Malcolm McCrimmon](https://insearchofsecrets.com/).
+They are licensed under a CC BY-SA 4.0 International license.
 
 The button graphic Button-Red.png was created by Wikimedia user "AzaToth" and
 is licensed under a CC BY-SA 3.0 Unported license. Retrieved March 2014 from

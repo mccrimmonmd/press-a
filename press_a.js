@@ -13,7 +13,7 @@ const buttonRatio = 5;
 let confetti = [];
 let confettiSize = 10; //default
 let confettiRatio = 10;
-let CONFETTI_DENSITY = 0.25; //0 = no confetti, 1 = max confetti
+let CONFETTI_DENSITY = 0.25; //n = 0 = no confetti, >1 = n per frame
 let DRIFT_RATIO = 10;
 const COLORS = ["cyan", "magenta", "yellow", "red",  "blue", "green"]; //, "purple"
 
@@ -95,27 +95,26 @@ window.onload = function() {
 };
 window.onresize = resizeCanvas;
 
-function resizeCanvas() { //TODO: don't restrict to square
-	if (window.innerWidth !== canvas.width) {
-		canvas.width = window.innerWidth;
-		canvas.height = window.innerWidth;
-	}
-	if (window.innerHeight < canvas.height) {
-		canvas.width = window.innerHeight;
-		canvas.height = window.innerHeight;
-	}
+function resizeCanvas() {
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
 	if (canvas.width < MIN_WIDTH) {
 		canvas.width = MIN_WIDTH;
+	}
+	if (canvas.height < MIN_WIDTH) {
 		canvas.height = MIN_WIDTH;
 	}
+	let resizeBy = canvas.width < canvas.height ?
+		canvas.width :
+		canvas.height;
+	// TODO: max width?
 
-	buttonRadius = Math.ceil(canvas.width / buttonRatio);
+	buttonRadius = Math.ceil(resizeBy / buttonRatio);
 	confettiSize = Math.ceil(buttonRadius / confettiRatio);
 }
 
 function drawEverything() {
 	canvasContext.clearRect(0,0, canvas.width,canvas.height);
-	//canvasContext.strokeRect(0,0, canvas.width,canvas.height);
 	drawButton();
 	let pointSize = Math.ceil(buttonRadius * (2/3));
 	drawLetter(pointSize);
@@ -123,6 +122,7 @@ function drawEverything() {
 	if (score >= WINNING_SCORE) {
 		drawConfetti();
 	}
+	// drawDebug();
 }
 
 function drawButton() {
@@ -168,7 +168,8 @@ function getCaption(currentScore) {
 }
 
 function drawConfetti() {
-	if (Math.random() < CONFETTI_DENSITY) {
+	let density = CONFETTI_DENSITY;
+	while (Math.random() < density) {
 		let newConfetti = {
 			xPos: randNum(canvas.width),
 			yPos: -confettiSize,
@@ -179,6 +180,7 @@ function drawConfetti() {
 			rotVel: randInt(-3, 3)
 		};
 		confetti.push(newConfetti);
+		density -= 1;
 	}
 	confetti.forEach((confetto) => {
 		drawSquare(confetto.xPos, confetto.yPos,
@@ -196,6 +198,11 @@ function drawConfetti() {
 	toDelete.forEach((pos, index) => {
 		confetti.splice(pos - index, 1);
 	});
+}
+
+function drawDebug() {
+	canvasContext.strokeRect(0,0, canvas.width,canvas.height);
+	drawSquare(canvas.width/2, canvas.height/2, 15, "black")
 }
 
 function drawSquare(xPos, yPos, size, color, twisted = 0) {
