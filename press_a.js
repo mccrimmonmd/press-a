@@ -1,12 +1,13 @@
 let canvas;
 let canvasContext;
-const MIN_WIDTH = 200;
+const MIN_WIDTH = 500;
 
 let buttonImg = new Image();
 buttonImg.src = "images/Button-Red.png";
 let flippedImg = new Image();
 flippedImg.src = "images/Button-Red-Flipped.png";
 let isPressed = false;
+let pressedByMouse = false;
 let buttonRadius = 200; //default
 const buttonRatio = 5;
 
@@ -17,7 +18,7 @@ let CONFETTI_DENSITY = 0.25; //n = 0 = no confetti, >1 = n per frame
 let DRIFT_RATIO = 10;
 const COLORS = ["cyan", "magenta", "yellow", "red",  "blue", "green"]; //, "purple"
 
-let score = 359;
+let score = 0;
 const WINNING_SCORE = 360;
 
 function calculateMousePos(evt) {
@@ -40,28 +41,33 @@ function distanceFromButton(pos) {
 function handleMouseClick(evt) {
 	let pos = calculateMousePos(evt);
 	let dist = distanceFromButton(pos);
-	if (dist <= buttonRadius) {
-			pressButton();
+	if (!isPressed && dist <= buttonRadius) {
+		pressedByMouse = true;
+		pressButton();
 	}
 }
 
 function handleMouseUp(evt) {
-	releaseButton();
+	if (pressedByMouse) {
+		pressedByMouse = false;
+		releaseButton();
+	}
 }
 
 function handleKeyDown(evt) {
 	if (evt.keyCode === 27) { //esc
-		//TODO: show confirmation dialog
-		score = 0;
-	  confetti = [];
+		if (confirm("Restart?")) {
+			score = 0;
+			confetti = [];
+		}
 	}
-	if (evt.keyCode === 65) {
+	if (!isPressed && evt.keyCode === 65) { //A
 		pressButton();
 	}
 }
 
 function handleKeyUp(evt) {
-	if (evt.keyCode === 65) {
+	if (!pressedByMouse && evt.keyCode === 65) { //A
 		releaseButton();
 	}
 }
@@ -122,7 +128,7 @@ function drawEverything() {
 	if (score >= WINNING_SCORE) {
 		drawConfetti();
 	}
-	// drawDebug();
+	// drawDebug(pointSize);
 }
 
 function drawButton() {
@@ -201,8 +207,9 @@ function drawConfetti() {
 }
 
 function drawDebug() {
-	canvasContext.strokeRect(0,0, canvas.width,canvas.height);
+	canvasContext.strokeRect(0,0, canvas.width-5,canvas.height-5);
 	drawSquare(canvas.width/2, canvas.height/2, 15, "black")
+	canvasContext.fillText(score, 20,20);
 }
 
 function drawSquare(xPos, yPos, size, color, twisted = 0) {
@@ -248,7 +255,6 @@ function animateConfetti(confetto) {
 	confetto.percentRotated %= 100;
 
 	let drift = confetto.xVel;
-	// confetto.yVel = Math.abs(drift === 0 ? 0 : 1/drift) * 2 + 1;
 	confetto.yPos += confetto.yVel;
 	confetto.xPos += drift / DRIFT_RATIO;
 
