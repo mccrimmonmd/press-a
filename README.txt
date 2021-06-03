@@ -1,4 +1,4 @@
-"Press 'A' to Win" v0.8
+"Press 'A' to Win" v1.0
 
 Press 'A' to win! If you don't press 'A', you won't win. Don't you want to win?
 
