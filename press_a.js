@@ -18,7 +18,7 @@ let CONFETTI_DENSITY = 0.25; //n = 0 = no confetti, >1 = n per frame
 let DRIFT_RATIO = 10;
 const COLORS = ["cyan", "magenta", "yellow", "red",  "blue", "green"]; //, "purple"
 
-let score = 0;
+let score = 359;
 const WINNING_SCORE = 360;
 
 function calculateMousePos(evt) {
@@ -175,18 +175,10 @@ function getCaption(currentScore) {
 
 function drawConfetti() {
 	let density = CONFETTI_DENSITY;
-	while (Math.random() < density) {
-		let newConfetti = {
-			xPos: randNum(canvas.width),
-			yPos: -confettiSize,
-			color: COLORS[randInt(COLORS.length)],
-			yVel: Math.random() * 1.5 + 0.75,
-			xVel: randInt(-10, 10),
-			percentRotated: randInt(25),
-			rotVel: randInt(-3, 3)
-		};
-		confetti.push(newConfetti);
-		density -= 1;
+	spawnConfetti(density);
+	if (score === WINNING_SCORE) {
+		spawnCannonConfetti(density);
+		score += 1;
 	}
 	confetti.forEach((confetto) => {
 		drawSquare(confetto.xPos, confetto.yPos,
@@ -197,13 +189,59 @@ function drawConfetti() {
 	});
 	let toDelete = [];
 	confetti.forEach((confetto, index) => {
-		if (confetto.yPos - confettiSize > canvas.height) {
+		if (confetto.yPos - confettiSize > canvas.height ||
+				confetto.xPos + confettiSize < 0) {
 			toDelete.push(index);
 		}
 	});
 	toDelete.forEach((pos, index) => {
 		confetti.splice(pos - index, 1);
 	});
+}
+
+function spawnConfetti(density) {
+	while (Math.random() < density) {
+		let newConfetti = {
+			xPos: randNum(canvas.width),
+			yPos: -confettiSize,
+			color: COLORS[randInt(COLORS.length)],
+			yVel: Math.random() * 1.5 + 0.75,
+			xVel: randInt(-10, 10),
+			percentRotated: randInt(25),
+			rotVel: randInt(-3, 3),
+			isCannon: false
+		};
+		confetti.push(newConfetti);
+		density -= 1;
+	}
+}
+
+function spawnCannonConfetti(density) {
+	let numSpawn = Math.ceil(density * 100);
+	for (let i = 0; i < numSpawn; i++) {
+		let leftConfetti = {
+			xPos: -confettiSize,
+			yPos: confettiSize + canvas.height,
+			color: COLORS[randInt(COLORS.length)],
+			yVel: randInt(-5, -3), //TODO
+			xVel: randInt(10, 35),
+			percentRotated: randInt(25),
+			rotVel: randInt(-3, 3),
+			isCannon: true
+		};
+		let rightConfetti = {
+			xPos: confettiSize + canvas.width,
+			yPos: confettiSize + canvas.height,
+			color: COLORS[randInt(COLORS.length)],
+			yVel: -5, //TODO
+			xVel: randInt(-35, -10),
+			percentRotated: randInt(25),
+			rotVel: randInt(-3, 3),
+			isCannon: true
+		};
+		confetti.push(leftConfetti);
+		confetti.push(rightConfetti);
+	}
 }
 
 function drawDebug() {
@@ -258,6 +296,11 @@ function animateConfetti(confetto) {
 	confetto.yPos += confetto.yVel;
 	confetto.xPos += drift / DRIFT_RATIO;
 
+	if (confetto.isCannon) {
+		// animateCannonConfetti(confetto);
+		return;
+	}
+
 	//poor man's sine wave--I came up with this myself, apparently??
 	if (drift % 2 === 0) {
 		if (drift < 20) {
@@ -277,6 +320,10 @@ function animateConfetti(confetto) {
 	}
 }
 
+function animateCannonConfetti(confetto) {
+	//TODO: shoot it up, up, up (and to the sides)
+}
+
 function randNum(bound, upperBound = null) {
 	let lowerBound;
 	if (upperBound === null) {
@@ -289,7 +336,7 @@ function randNum(bound, upperBound = null) {
 
 	if (lowerBound <= upperBound) {
 		let range = upperBound - lowerBound;
-		return Math.random() * range + lowerBound;
+		return Math.random() * range + lowerBound; // TODO: negs
 	}
 	else {
 		return 0;
