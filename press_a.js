@@ -1,5 +1,19 @@
 let canvas;
 let canvasContext;
+
+const config = {
+	minWidth: 500,
+	buttonRatio: 5,
+	confettiRatio: 10,
+	confettiDensity: 0.25, //n = 0 = no confetti, >1 = n per frame
+	driftRatio: 10,
+	winningScore: 360,
+	framesPerSecond: 30,
+	cannonSpreadMin: 10,
+	cannonSpreadMax: 80
+};
+const COLORS = ["cyan", "magenta", "yellow", "red",  "blue", "green"]; //, "purple"
+
 const MIN_WIDTH = 500;
 
 let buttonImg = new Image();
@@ -14,9 +28,8 @@ const buttonRatio = 5;
 let confetti = [];
 let confettiSize = 10; //default
 let confettiRatio = 10;
-let CONFETTI_DENSITY = 0.25; //n = 0 = no confetti, >1 = n per frame
-let DRIFT_RATIO = 10;
-const COLORS = ["cyan", "magenta", "yellow", "red",  "blue", "green"]; //, "purple"
+const CONFETTI_DENSITY = 0.25; //n = 0 = no confetti, >1 = n per frame
+const DRIFT_RATIO = 10;
 
 let score = 359;
 const WINNING_SCORE = 360;
@@ -73,7 +86,7 @@ function handleKeyUp(evt) {
 }
 
 function pressButton() {
-	if (score < WINNING_SCORE) {
+	if (score < config.winningScore) {
 		isPressed = true;
 		score += 1;
 	}
@@ -87,10 +100,9 @@ window.onload = function() {
 	canvas = document.getElementById('gameCanvas');
 	canvasContext = canvas.getContext('2d');
 
-	let framesPerSecond = 30;
 	setInterval( function() {
 		drawEverything();
-	}, 1000/framesPerSecond );
+	}, 1000/config.framesPerSecond );
 
 	canvas.addEventListener('mousedown', handleMouseClick);
 	canvas.addEventListener('mouseup', handleMouseUp);
@@ -104,19 +116,19 @@ window.onresize = resizeCanvas;
 function resizeCanvas() {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
-	if (canvas.width < MIN_WIDTH) {
-		canvas.width = MIN_WIDTH;
+	if (canvas.width < config.minWidth) {
+		canvas.width = config.minWidth;
 	}
-	if (canvas.height < MIN_WIDTH) {
-		canvas.height = MIN_WIDTH;
+	if (canvas.height < config.minWidth) {
+		canvas.height = config.minWidth;
 	}
 	let resizeBy = canvas.width < canvas.height ?
 		canvas.width :
 		canvas.height;
 	// TODO: max width?
 
-	buttonRadius = Math.ceil(resizeBy / buttonRatio);
-	confettiSize = Math.ceil(buttonRadius / confettiRatio);
+	buttonRadius = Math.ceil(resizeBy / config.buttonRatio);
+	confettiSize = Math.ceil(buttonRadius / config.confettiRatio);
 }
 
 function drawEverything() {
@@ -125,7 +137,7 @@ function drawEverything() {
 	let pointSize = Math.ceil(buttonRadius * (2/3));
 	drawLetter(pointSize);
 	drawCaption(pointSize);
-	if (score >= WINNING_SCORE) {
+	if (score >= config.winningScore) {
 		drawConfetti();
 	}
 	// drawDebug(pointSize);
@@ -145,7 +157,7 @@ function drawLetter(pointSize) {
 	canvasContext.textAlign = 'center';
 	canvasContext.font = 'normal ' + pointSize + 'pt monospace';
 	let textPosition = {x: canvas.width / 2 + (isPressed ? 2 : 0),
-											y: canvas.height /2 + (isPressed ? 2 : 0)};
+											y: canvas.height/ 2 + (isPressed ? 2 : 0)};
 	canvasContext.fillText("A", textPosition.x, textPosition.y);
 }
 
@@ -156,7 +168,7 @@ function drawCaption(pointSize) {
 	canvasContext.font = 'normal ' + Math.ceil(pointSize / 4) + 'pt monospace';
 	let buffer = canvas.width / 20;
 	let captionPosition = {x: canvas.width / 2,
-												 y: canvas.height / 2 + buttonRadius + buffer};
+												 y: canvas.height/ 2 + buttonRadius + buffer};
 	canvasContext.fillText(getCaption(score), captionPosition.x,
 																						captionPosition.y);
 }
@@ -169,14 +181,14 @@ function getCaption(currentScore) {
 	else if (currentScore < 150) return "Faster! Faster!";
 	else if (currentScore < 200) return "Keep going! Don't give up!";
 	else if (currentScore < 265) return "Almost there!";
-	else if (currentScore < WINNING_SCORE) return "Soooo close!";
+	else if (currentScore < config.winningScore) return "Soooo close!";
 	else return "CONGRATULATIONS! YOU WIN!!!";
 }
 
 function drawConfetti() {
-	let density = CONFETTI_DENSITY;
+	let density = config.confettiDensity;
 	spawnConfetti(density);
-	if (score === WINNING_SCORE) {
+	if (score === config.winningScore) {
 		spawnCannonConfetti(density);
 		score += 1;
 	}
@@ -203,7 +215,7 @@ function spawnConfetti(density) {
 	while (Math.random() < density) {
 		let newConfetti = {
 			xPos: randNum(canvas.width),
-			yPos: -confettiSize,
+			yPos: -(confettiSize * 2),
 			color: COLORS[randInt(COLORS.length)],
 			yVel: Math.random() * 1.5 + 0.75,
 			xVel: randInt(-10, 10),
@@ -219,12 +231,15 @@ function spawnConfetti(density) {
 function spawnCannonConfetti(density) {
 	let numSpawn = Math.ceil(density * 100);
 	for (let i = 0; i < numSpawn; i++) {
+		// TODO: create random vectors, then convert to x/y speed
+		// let leftSpeeds = vectorToSpeeds(getCannonVector("left"));
+		// let rightVector = vectorToSpeeds(getCannonVector("right"));
 		let leftConfetti = {
 			xPos: -confettiSize,
 			yPos: confettiSize + canvas.height,
 			color: COLORS[randInt(COLORS.length)],
-			yVel: randInt(-5, -3), //TODO
-			xVel: randInt(10, 35),
+			yVel: randNum(-5, -3),
+			xVel: randInt(10, 50),
 			percentRotated: randInt(25),
 			rotVel: randInt(-3, 3),
 			isCannon: true
@@ -233,14 +248,26 @@ function spawnCannonConfetti(density) {
 			xPos: confettiSize + canvas.width,
 			yPos: confettiSize + canvas.height,
 			color: COLORS[randInt(COLORS.length)],
-			yVel: -5, //TODO
-			xVel: randInt(-35, -10),
+			yVel: randNum(-5, -3),
+			xVel: randInt(-50, -10),
 			percentRotated: randInt(25),
 			rotVel: randInt(-3, 3),
 			isCannon: true
 		};
 		confetti.push(leftConfetti);
 		confetti.push(rightConfetti);
+	}
+}
+
+function getCannonVecor(side) {
+	if (side === "left") {
+		let angle = randNum(config.cannonSpreadMin, config.cannonSpreadMax);
+	}
+	else if (side === "right") {
+		//right side
+	}
+	else {
+		throw Error("Parameter 'side' should be 'left' or 'right', was actually " + side);
 	}
 }
 
@@ -294,7 +321,7 @@ function animateConfetti(confetto) {
 
 	let drift = confetto.xVel;
 	confetto.yPos += confetto.yVel;
-	confetto.xPos += drift / DRIFT_RATIO;
+	confetto.xPos += drift / config.driftRatio;
 
 	if (confetto.isCannon) {
 		// animateCannonConfetti(confetto);
@@ -324,6 +351,7 @@ function animateCannonConfetti(confetto) {
 	//TODO: shoot it up, up, up (and to the sides)
 }
 
+/* randNum: returns a float in the range [bound, upperBound) or [0, bound) */
 function randNum(bound, upperBound = null) {
 	let lowerBound;
 	if (upperBound === null) {
@@ -336,13 +364,16 @@ function randNum(bound, upperBound = null) {
 
 	if (lowerBound <= upperBound) {
 		let range = upperBound - lowerBound;
-		return Math.random() * range + lowerBound; // TODO: negs
+		return Math.random() * range + lowerBound;
 	}
 	else {
 		return 0;
 	}
 }
 
+/* randInt: returns an integer in the range [bound, upperBound] or [0, bound]
+ * (INCLUSIVE!) */
 function randInt(bound, upperBound = null) {
+	upperBound = upperBound === null ? null : upperBound + 1;
 	return Math.floor(randNum(bound, upperBound));
 }
