@@ -10,14 +10,14 @@ const config = {
 	driftRatio: 10,
 	winningScore: 360,
 	framesPerSecond: 30,
-	// TODO: tweak!
-	cannonSpreadMin: -50,
-	cannonSpreadMax: -40,
-	cannonSpeedMin: 2,
-	cannonSpeedMax: 4
+	cannonSpreadMin: 10,
+	cannonSpreadMax: 55, //function of width?
+	cannonSpeedMin: 5,
+	cannonSpeedMax: 30,
+	cannonDensityMultiplier: 300
 };
 
-let score = 359;
+let score = 0;
 
 let confetti = [];
 let confettiSize = 10; //default
@@ -226,7 +226,7 @@ function spawnConfetti(density) {
 }
 
 function spawnCannonConfetti(density) {
-	let numSpawn = Math.ceil(density * 100);
+	let numSpawn = Math.ceil(density * config.cannonDensityMultiplier);
 	for (let i = 0; i < numSpawn; i++) {
 		let leftSpeeds = vectorToSpeeds(getCannonVector("left"));
 		let leftConfetti = {
@@ -258,8 +258,9 @@ function spawnCannonConfetti(density) {
 function getCannonVector(side) {
 	let angle = randNum(config.cannonSpreadMin, config.cannonSpreadMax);
 	if (side === "right") {
-		angle += 270;
+		angle = -angle;
 	}
+	angle -= 90;
 	let speed = randNum(config.cannonSpeedMin, config.cannonSpeedMax);
 	return {angle: angle, r: speed};
 }
@@ -327,7 +328,6 @@ function animateConfetti(confetto) {
 	}
 	let drift = confetto.xVel;
 	confetto.xPos += drift / config.driftRatio;
-
 
 	//poor man's sine wave--I came up with this myself, apparently??
 	if (drift % 2 === 0) {
