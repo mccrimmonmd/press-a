@@ -1,6 +1,7 @@
 let canvas;
 let canvasContext;
 
+const COLORS = ["cyan", "magenta", "yellow", "red",  "blue", "green"]; //, "purple"
 const config = {
 	minWidth: 500,
 	buttonRatio: 5,
@@ -9,30 +10,26 @@ const config = {
 	driftRatio: 10,
 	winningScore: 360,
 	framesPerSecond: 30,
-	cannonSpreadMin: 10,
-	cannonSpreadMax: 80
+	// TODO: tweak!
+	cannonSpreadMin: -50,
+	cannonSpreadMax: -40,
+	cannonSpeedMin: 2,
+	cannonSpeedMax: 4
 };
-const COLORS = ["cyan", "magenta", "yellow", "red",  "blue", "green"]; //, "purple"
 
-const MIN_WIDTH = 500;
+let score = 359;
+
+let confetti = [];
+let confettiSize = 10; //default
 
 let buttonImg = new Image();
 buttonImg.src = "images/Button-Red.png";
 let flippedImg = new Image();
 flippedImg.src = "images/Button-Red-Flipped.png";
+
 let isPressed = false;
 let pressedByMouse = false;
 let buttonRadius = 200; //default
-const buttonRatio = 5;
-
-let confetti = [];
-let confettiSize = 10; //default
-let confettiRatio = 10;
-const CONFETTI_DENSITY = 0.25; //n = 0 = no confetti, >1 = n per frame
-const DRIFT_RATIO = 10;
-
-let score = 359;
-const WINNING_SCORE = 360;
 
 function calculateMousePos(evt) {
 	let rect = canvas.getBoundingClientRect();
@@ -231,25 +228,24 @@ function spawnConfetti(density) {
 function spawnCannonConfetti(density) {
 	let numSpawn = Math.ceil(density * 100);
 	for (let i = 0; i < numSpawn; i++) {
-		// TODO: create random vectors, then convert to x/y speed
-		// let leftSpeeds = vectorToSpeeds(getCannonVector("left"));
-		// let rightVector = vectorToSpeeds(getCannonVector("right"));
+		let leftSpeeds = vectorToSpeeds(getCannonVector("left"));
 		let leftConfetti = {
 			xPos: -confettiSize,
 			yPos: confettiSize + canvas.height,
 			color: COLORS[randInt(COLORS.length)],
-			yVel: randNum(-5, -3),
-			xVel: randInt(10, 50),
+			xVel: leftSpeeds.dx,
+			yVel: leftSpeeds.dy,
 			percentRotated: randInt(25),
 			rotVel: randInt(-3, 3),
 			isCannon: true
 		};
+		let rightSpeeds = vectorToSpeeds(getCannonVector("right"));
 		let rightConfetti = {
 			xPos: confettiSize + canvas.width,
 			yPos: confettiSize + canvas.height,
 			color: COLORS[randInt(COLORS.length)],
-			yVel: randNum(-5, -3),
-			xVel: randInt(-50, -10),
+			xVel: rightSpeeds.dx,
+			yVel: rightSpeeds.dy,
 			percentRotated: randInt(25),
 			rotVel: randInt(-3, 3),
 			isCannon: true
@@ -259,16 +255,20 @@ function spawnCannonConfetti(density) {
 	}
 }
 
-function getCannonVecor(side) {
-	if (side === "left") {
-		let angle = randNum(config.cannonSpreadMin, config.cannonSpreadMax);
+function getCannonVector(side) {
+	let angle = randNum(config.cannonSpreadMin, config.cannonSpreadMax);
+	if (side === "right") {
+		angle += 270;
 	}
-	else if (side === "right") {
-		//right side
-	}
-	else {
-		throw Error("Parameter 'side' should be 'left' or 'right', was actually " + side);
-	}
+	let speed = randNum(config.cannonSpeedMin, config.cannonSpeedMax);
+	return {angle: angle, r: speed};
+}
+
+function vectorToSpeeds(vector) {
+	let angle = toRadians(vector.angle);
+	let dx = vector.r * Math.cos(angle);
+	let dy = vector.r * Math.sin(angle);
+	return {dx: dx, dy: dy};
 }
 
 function drawDebug() {
@@ -277,10 +277,11 @@ function drawDebug() {
 	canvasContext.fillText(score, 20,20);
 }
 
-function drawSquare(xPos, yPos, size, color, twisted = 0) {
+function drawSquare(xPos, yPos, size, color, percentRotated = 0) {
 	canvasContext.fillStyle = color;
 	canvasContext.strokeStyle = "black";
-	let points = rotateSquareAt(xPos, yPos, size, twisted/100);
+	let degrees = percentRotated * 3.6;
+	let points = rotateSquareAt(xPos, yPos, size, degrees);
 	let square = new Path2D();
 	square.moveTo(points[0].x, points[0].y);
 	square.lineTo(points[1].x, points[1].y);
@@ -291,7 +292,7 @@ function drawSquare(xPos, yPos, size, color, twisted = 0) {
 	canvasContext.stroke(square);
 }
 
-function rotateSquareAt(xPos, yPos, size, angle) {
+function rotateSquareAt(xPos, yPos, size, degrees) {
 	let offset = {
 		x: {max: xPos + (size / 2), min: xPos - (size / 2)},
 		y: {max: yPos + (size / 2), min: yPos - (size / 2)}
@@ -302,7 +303,7 @@ function rotateSquareAt(xPos, yPos, size, angle) {
 		{x:xPos - offset.x.min, y:yPos - offset.y.min},
 		{x:xPos - offset.x.max, y:yPos - offset.y.min}
 	];
-	let radians =  2 * Math.PI * angle;
+	let radians =  toRadians(degrees);
 	let cos = Math.cos(radians);
 	let sin = Math.sin(radians);
 	let rotated = translated.map(point => ({
@@ -319,14 +320,14 @@ function animateConfetti(confetto) {
 	confetto.percentRotated += confetto.rotVel;
 	confetto.percentRotated %= 100;
 
-	let drift = confetto.xVel;
 	confetto.yPos += confetto.yVel;
-	confetto.xPos += drift / config.driftRatio;
-
 	if (confetto.isCannon) {
-		// animateCannonConfetti(confetto);
+		confetto.xPos += confetto.xVel;
 		return;
 	}
+	let drift = confetto.xVel;
+	confetto.xPos += drift / config.driftRatio;
+
 
 	//poor man's sine wave--I came up with this myself, apparently??
 	if (drift % 2 === 0) {
@@ -345,10 +346,6 @@ function animateConfetti(confetto) {
 			confetto.xVel = -20;
 		}
 	}
-}
-
-function animateCannonConfetti(confetto) {
-	//TODO: shoot it up, up, up (and to the sides)
 }
 
 /* randNum: returns a float in the range [bound, upperBound) or [0, bound) */
@@ -376,4 +373,8 @@ function randNum(bound, upperBound = null) {
 function randInt(bound, upperBound = null) {
 	upperBound = upperBound === null ? null : upperBound + 1;
 	return Math.floor(randNum(bound, upperBound));
+}
+
+function toRadians(degrees) {
+	return  Math.PI * (degrees/180);
 }
