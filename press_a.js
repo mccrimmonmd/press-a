@@ -1,7 +1,7 @@
 let canvas;
 let canvasContext;
 
-const COLORS = ["cyan", "magenta", "yellow", "red",  "blue", "green"]; //, "purple"
+const COLORS = ["cyan", "magenta", "yellow", "red",  "blue", "green"];
 const config = {
 	minWidth: 500,
 	buttonRatio: 5,
@@ -11,13 +11,13 @@ const config = {
 	winningScore: 360,
 	framesPerSecond: 30,
 	cannonSpreadMin: 10,
-	cannonSpreadMax: 55, //function of width?
+	cannonSpreadMax: 55,
 	cannonSpeedMin: 5,
 	cannonSpeedMax: 30,
 	cannonDensityMultiplier: 300
 };
 
-let score = 0;
+let score = 0; //config.winningScore - 1;
 
 let confetti = [];
 let confettiSize = 10; //default
@@ -122,7 +122,6 @@ function resizeCanvas() {
 	let resizeBy = canvas.width < canvas.height ?
 		canvas.width :
 		canvas.height;
-	// TODO: max width?
 
 	buttonRadius = Math.ceil(resizeBy / config.buttonRatio);
 	confettiSize = Math.ceil(buttonRadius / config.confettiRatio);

@@ -1,7 +1,6 @@
-- Add gravity to "cannon" confetti
-
+- Add gravity and air resistance to "cannon" confetti
+- Adjust confetti density based on window width
+- Adjust cannon spread based on window width
 - Sounds (e.g. button presses, victory fanfare)
-
 - Streamers (and other types of "alternate" confetti)
-
 - Have confetti rotate in 3D? (Might be good practice)
